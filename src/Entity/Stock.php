@@ -14,7 +14,7 @@ class Stock
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['produit:read', 'stock:read'])]
+    #[Groups(['produit:read', 'stock:read', 'forStk:read'])]
 
     private ?int $id = null;
 
@@ -34,7 +34,7 @@ class Stock
     private ?Depot $depot = null;
 
     #[ORM\Column]
-    #[Groups(['produit:read', 'stock:read'])]
+    #[Groups(['produit:read', 'stock:read', 'forStk:read'])]
     private ?int $qte = null;
 
     #[ORM\ManyToOne]

@@ -27,7 +27,7 @@ class StockController extends AbstractController
     #[Route('/getProduits', name: 'getProduit', methods: ['GET'])]
     public function getProduit(ProduitsRepository $p)
     {
-        return $this->json(['Produits' => $p->findBySuppr(0)], 200, [], ['groups' => 'produit:read']) ;
+        return $this->json(['Produits' => $p->findBySuppr(0)], 200, [], ['groups' => 'forStk:read']) ;
     }
 
     #[Route('/getProduitStock', name: 'getProduitStock', methods: ['GET'])]

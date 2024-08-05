@@ -15,18 +15,18 @@ class Produits
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['produit:read', 'stock:read'])]
+    #[Groups(['produit:read', 'stock:read', 'forStk:read'])]
 
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['produit:read', 'stock:read'])]
+    #[Groups(['produit:read', 'stock:read', 'forStk:read'])]
 
 
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['produit:read', 'stock:read'])]
+    #[Groups(['produit:read', 'stock:read', 'forStk:read'])]
 
 
     private ?string $description = null;
@@ -50,7 +50,7 @@ class Produits
 
     #[ORM\ManyToOne(inversedBy: 'produits')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['produit:read'])]
+    #[Groups(['produit:read','forStk:read'])]
 
     private ?Famille $famille = null;
 
@@ -58,12 +58,12 @@ class Produits
      * @var Collection<int, UnitesP>
      */
     #[ORM\OneToMany(targetEntity: UnitesP::class, mappedBy: 'produits')]
-    #[Groups(['produit:read'])]
+    #[Groups(['produit:read','forStk:read'])]
 
     private Collection $unite;
 
     #[ORM\Column]
-    #[Groups(['produit:read'])]
+    #[Groups(['produit:read','forStk:read'])]
 
     private ?int $seuil = null;
 

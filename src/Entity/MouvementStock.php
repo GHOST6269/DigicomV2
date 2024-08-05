@@ -77,6 +77,10 @@ class MouvementStock
 
     private ?Fournisseur $fournisseur = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Achat $achat = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -222,6 +226,18 @@ class MouvementStock
     public function setFournisseur(?Fournisseur $fournisseur): static
     {
         $this->fournisseur = $fournisseur;
+
+        return $this;
+    }
+
+    public function getAchat(): ?Achat
+    {
+        return $this->achat;
+    }
+
+    public function setAchat(?Achat $achat): static
+    {
+        $this->achat = $achat;
 
         return $this;
     }

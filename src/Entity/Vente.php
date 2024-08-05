@@ -32,14 +32,8 @@ class Vente
     #[ORM\OneToMany(targetEntity: DetailVente::class, mappedBy: 'vente')]
     private Collection $detailVentes;
 
-    /**
-     * @var Collection<int, Paiement>
-     */
-    #[ORM\OneToMany(targetEntity: Paiement::class, mappedBy: 'vente')]
-    private Collection $paiements;
-
     #[ORM\ManyToOne(inversedBy: 'ventes')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Utilisateur $utilisateur = null;
 
     #[ORM\ManyToOne]
@@ -54,7 +48,6 @@ class Vente
     public function __construct()
     {
         $this->detailVentes = new ArrayCollection();
-        $this->paiements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -122,36 +115,6 @@ class Vente
             // set the owning side to null (unless already changed)
             if ($detailVente->getVente() === $this) {
                 $detailVente->setVente(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Paiement>
-     */
-    public function getPaiements(): Collection
-    {
-        return $this->paiements;
-    }
-
-    public function addPaiement(Paiement $paiement): static
-    {
-        if (!$this->paiements->contains($paiement)) {
-            $this->paiements->add($paiement);
-            $paiement->setVente($this);
-        }
-
-        return $this;
-    }
-
-    public function removePaiement(Paiement $paiement): static
-    {
-        if ($this->paiements->removeElement($paiement)) {
-            // set the owning side to null (unless already changed)
-            if ($paiement->getVente() === $this) {
-                $paiement->setVente(null);
             }
         }
 

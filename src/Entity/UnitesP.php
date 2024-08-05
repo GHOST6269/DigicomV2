@@ -13,17 +13,17 @@ class UnitesP
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['produit:read', 'stock:read'])]
+    #[Groups(['produit:read', 'stock:read','forStk:read'])]
 
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['produit:read', 'stock:read'])]
+    #[Groups(['produit:read', 'stock:read','forStk:read'])]
 
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['produit:read', 'stock:read'])]
+    #[Groups(['produit:read', 'stock:read','forStk:read'])]
 
     private ?int $valeur = null;
 
@@ -36,19 +36,19 @@ class UnitesP
     private ?Produits $produits = null;
 
     #[ORM\Column]
-    #[Groups(['produit:read', 'stock:read'])]
+    #[Groups(['produit:read', 'stock:read','forStk:read'])]
 
     private ?int $prix = null;
 
     #[ORM\ManyToOne(inversedBy: 'unitesPs')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['stock:read'])]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['stock:read', 'forStk:read'])]
 
     private ?Stock $stockDepot = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['stock:read'])]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['stock:read','forStk:read'])]
 
     private ?Stock $stockMagasin = null;
 

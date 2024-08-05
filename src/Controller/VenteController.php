@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\DetailVente;
+use App\Entity\MouvementStock;
 use App\Entity\PaiementCredit;
 use App\Entity\Vente;
 use App\Repository\ClientRepository;
@@ -33,7 +34,7 @@ class VenteController extends AbstractController
         $vente = $data->vente ;
         $detailVente = $data->produit ;
         $newVente = new Vente() ;
-        $newVente->setDate(new \DateTime()) ;
+        $newVente->setDate(new DateTime()) ;
         $newVente->setMagasin($mag->find(1)) ;
         $newVente->setMontanttotal($vente->montanttotal) ;
         $newVente->setModePaiement($vente->modePaiement) ;
@@ -65,6 +66,16 @@ class VenteController extends AbstractController
             $stock->setQte($stock->getQte() - $detailVente[$i]->valeur) ;
             $entityManager = $this->entityManager ;
             $entityManager->persist($stock) ;
+            $entityManager->flush() ;
+            $mouvementStk = new MouvementStock() ;
+            $mouvementStk->setDate(new DateTime()) ;
+            $mouvementStk->setProduits($produitInsert) ;
+            $mouvementStk->setEmplacementoriginMagasin($mag->find(1)) ;
+            $mouvementStk->setQte($detailVente[$i]->valeur) ;
+            $mouvementStk->setDescription('VENTE') ;
+            $mouvementStk->setUniteP($u->find($detailVente[$i]->id)) ;
+            $entityManager = $this->entityManager ;
+            $entityManager->persist($mouvementStk) ;
             $entityManager->flush() ;
         }
 
@@ -125,6 +136,16 @@ class VenteController extends AbstractController
         $stock->setQte($stock->getQte() - $detailVente[$i]->valeur) ;
         $entityManager = $this->entityManager ;
         $entityManager->persist($stock) ;
+        $entityManager->flush() ;
+
+        $mouvementStk = new MouvementStock() ;
+        $mouvementStk->setDate(new DateTime()) ;
+        $mouvementStk->setEmplacementoriginMagasin($mag->find(1)) ;
+        $mouvementStk->setQte($detailVente[$i]->valeur) ;
+        $mouvementStk->setDescription('VENTE') ;
+        $mouvementStk->setUniteP($u->find($detailVente[$i]->id)) ;
+        $entityManager = $this->entityManager ;
+        $entityManager->persist($mouvementStk) ;
         $entityManager->flush() ;
 
         return $this->json(['Produits' => $u->findBySuppr(0)], 200, [], ['groups' => 'stock:read']) ;

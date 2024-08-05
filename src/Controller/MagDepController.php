@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\DepotRepository;
 use App\Repository\MagasinRepository;
+use App\Repository\SocieteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,5 +31,11 @@ class MagDepController extends AbstractController
     public function getDepotList( DepotRepository $depot )
     {
         return $this->json([ 'DepotList' => $depot->findBySuppr(0)], 200, [], ['groups'=>'produit:read']) ;
+    }
+
+    #[Route('/getSociete', name: 'getSociete', methods: ['GET'])]
+    public function getSociete( SocieteRepository $soc )
+    {
+        return $this->json([ 'Societe' => $soc->find(1)]) ;
     }
 }
