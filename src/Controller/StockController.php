@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Entity\Produits;
 use App\Entity\Stock;
 use App\Entity\UnitesP;
+use App\Repository\DepotRepository;
 use App\Repository\FamilleRepository;
+use App\Repository\MagasinRepository;
 use App\Repository\ProduitsRepository;
 use App\Repository\UnitesPRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,12 +39,11 @@ class StockController extends AbstractController
     }
 
     #[Route('/createProduct', name: 'createProduct', methods: ['POST'])]
-    public function createProduct(Request $request, FamilleRepository $famille, ProduitsRepository $p)
+    public function createProduct(Request $request, FamilleRepository $famille, ProduitsRepository $p, DepotRepository $d, MagasinRepository $m)
     {
         $data = json_decode($request->getContent()) ;
 
         $familleOfNewP = $famille->findOneByLibelle($data->Produit->famille->libelle) ;
-
         $newProduit = new Produits() ;
         $newProduit->setNom($data->Produit->nom) ;
         $newProduit->setDescription($data->Produit->description) ;
@@ -57,6 +58,7 @@ class StockController extends AbstractController
         $unite = $data->Produit->unite ;
 
         for ($i=0; $i < count($unite); $i++) {
+
             $newUnite = new UnitesP() ;
             $newUnite->setNom($unite[$i]->nom) ;
             $newUnite->setPrix($unite[$i]->prix) ;
@@ -64,15 +66,30 @@ class StockController extends AbstractController
             $newUnite->setProduits($newProduit) ;
             $newUnite->setSuppr(0) ;
 
-            $stock = new Stock() ;
-            
-            $stock->setProduit($newProduit) ;
-            $stock->setUnite($newUnite) ;
-            $stock->setQte(0) ;
-
             $entityManager = $this->entityManager;
             $entityManager->persist($newUnite);
             $entityManager->flush();
+
+            $stockDepot = new Stock() ;
+            $stockDepot->setDepot($d->find(1)) ;
+            $stockDepot->setProduit($newProduit) ;
+            $stockDepot->setUnite($newUnite) ;
+            $stockDepot->setQte(0) ;
+            $stockDepot->setQteTheorique(0) ;
+            $entityManager = $this->entityManager;
+            $entityManager->persist($stockDepot);
+            $entityManager->flush();
+
+            $stockMagasin = new Stock() ;
+            $stockMagasin->setMagasin($m->find(1)) ;
+            $stockMagasin->setProduit($newProduit) ;
+            $stockMagasin->setUnite($newUnite) ;
+            $stockMagasin->setQte(0) ;
+            $stockMagasin->setQteTheorique(0) ;
+            $entityManager = $this->entityManager;
+            $entityManager->persist($stockMagasin);
+            $entityManager->flush();
+            
         }
 
         return $this->json(['Produits' => $p->findBySuppr(0)], 200, [], ['groups' => 'produit:read']) ;
@@ -107,17 +124,18 @@ class StockController extends AbstractController
                 $newUnite->setValeur($uniteData[$i]->valeur) ;
                 $newUnite->setProduits($prodToUpdate) ;
                 $newUnite->setSuppr(0) ;
-
                 $entityManager = $this->entityManager;
                 $entityManager->persist($newUnite);
                 $entityManager->flush();
+                
             }else{
-                $uniteToUpdate = $unite->find($data->Produit->unite[0]->id) ;
+                $uniteToUpdate = $unite->find($data->Produit->unite[$i]->id) ;
                 $uniteToUpdate->setNom($uniteData[$i]->nom) ;
                 $uniteToUpdate->setPrix($uniteData[$i]->prix) ;
                 $uniteToUpdate->setValeur($uniteData[$i]->valeur) ;
                 $uniteToUpdate->setProduits($prodToUpdate) ;
-                $entityManager = $this->entityManager;
+                $uniteToUpdate->setSuppr($uniteData[$i]->suppr) ;
+                $entityManager = $this->entityManager ;
                 $entityManager->persist($uniteToUpdate);
                 $entityManager->flush();
             }

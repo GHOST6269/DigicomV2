@@ -28,6 +28,7 @@ class UnitesP
     private ?int $valeur = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Groups(['stock:read','forStk:read'])]
     private ?int $suppr = null;
 
     #[ORM\ManyToOne(inversedBy: 'unite')]

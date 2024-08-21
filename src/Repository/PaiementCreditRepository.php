@@ -16,6 +16,17 @@ class PaiementCreditRepository extends ServiceEntityRepository
         parent::__construct($registry, PaiementCredit::class);
     }
 
+    public function findLatestByVente($vente)
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.vente = :vente')
+            ->setParameter('vente', $vente)
+            ->orderBy('e.id', 'DESC') 
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
 //    /**
 //     * @return PaiementCredit[] Returns an array of PaiementCredit objects
 //     */

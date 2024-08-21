@@ -101,10 +101,12 @@ class MouvementStockController extends AbstractController
                         if(!empty($stock)){
                             $stock->setProduit($produit) ;
                             $stock->setQte(($data->detail[$i]->produit->unite[$j]->valeur)+$stock->getQte()) ;
+                            $stock->setQteTheorique(($data->detail[$i]->produit->unite[$j]->valeur)+$stock->getQteTheorique()) ;
                         }else{
                             $stock = new Stock() ;
                             $stock->setProduit($produit) ;
                             $stock->setQte($data->detail[$i]->produit->unite[$j]->valeur) ;
+                            $stock->setQteTheorique($data->detail[$i]->produit->unite[$j]->valeur) ;
                         }
 
                         $stock->setUnite($uniteSelectionner) ;

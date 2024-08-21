@@ -38,6 +38,8 @@ class VenteController extends AbstractController
         $newVente->setMagasin($mag->find(1)) ;
         $newVente->setMontanttotal($vente->montanttotal) ;
         $newVente->setModePaiement($vente->modePaiement) ;
+        $newVente->setPaid(1) ;
+
         if(isset($vente->refPaiement)){
             $newVente->setRefPaiement($vente->refPaiement) ;
         }
@@ -45,9 +47,7 @@ class VenteController extends AbstractController
         $entityManager->persist($newVente) ;
         $entityManager->flush() ;
 
-        
-
-        for ($i=0; $i < count($detailVente) ; $i++) { 
+        for ($i=0; $i < count($detailVente) ; $i++) {
 
             $newDetailVente = new DetailVente() ;
             $newDetailVente->setVente($newVente) ;
@@ -57,16 +57,10 @@ class VenteController extends AbstractController
             $newDetailVente->setQte($detailVente[$i]->valeur) ;
             $newDetailVente->setPrix($detailVente[$i]->prix) ;
             $newDetailVente->setSuppr(0) ;
-
             $entityManager = $this->entityManager ;
             $entityManager->persist($newDetailVente) ;
             $entityManager->flush() ;
 
-            $stock = $s->findOneByProduitAndUniteAndMagasin($produitInsert, $u->find($detailVente[$i]->id), $mag->find(1)) ;
-            $stock->setQte($stock->getQte() - $detailVente[$i]->valeur) ;
-            $entityManager = $this->entityManager ;
-            $entityManager->persist($stock) ;
-            $entityManager->flush() ;
             $mouvementStk = new MouvementStock() ;
             $mouvementStk->setDate(new DateTime()) ;
             $mouvementStk->setProduits($produitInsert) ;
@@ -74,8 +68,17 @@ class VenteController extends AbstractController
             $mouvementStk->setQte($detailVente[$i]->valeur) ;
             $mouvementStk->setDescription('VENTE') ;
             $mouvementStk->setUniteP($u->find($detailVente[$i]->id)) ;
+
             $entityManager = $this->entityManager ;
             $entityManager->persist($mouvementStk) ;
+            $entityManager->flush() ;
+
+            $stock = $s->findOneByProduitAndUniteAndMagasin($produitInsert, $u->find($detailVente[$i]->id), $mag->find(1)) ;
+            $stockReste = $stock->getQte() - $detailVente[$i]->valeur ;
+            $stock->setQte($stockReste) ;
+            $stock->setQteTheorique($stockReste) ;
+            $entityManager = $this->entityManager ;
+            $entityManager->persist($stock) ;
             $entityManager->flush() ;
         }
 
@@ -94,27 +97,15 @@ class VenteController extends AbstractController
         $newVente->setMagasin($mag->find(1)) ;
         $newVente->setMontanttotal($vente->montanttotal) ;
         $newVente->setModePaiement($vente->modePaiement) ;
+        $newVente->setPaid(0) ;
+
         if(isset($vente->refPaiement)){
             $newVente->setRefPaiement($vente->refPaiement) ;
         }
+
         $entityManager = $this->entityManager ;
         $entityManager->persist($newVente) ;
         $entityManager->flush() ;
-
-        for ($i=0; $i < count($detailVente) ; $i++) {
-            $newDetailVente = new DetailVente() ;
-            $newDetailVente->setVente($newVente) ;
-            $produitInsert = $p->find($detailVente[$i]->produits->id) ;
-            $newDetailVente->setProduit($produitInsert) ;
-            $newDetailVente->setUnite($u->find($detailVente[$i]->id)) ;
-            $newDetailVente->setQte($detailVente[$i]->valeur) ;
-            $newDetailVente->setPrix($detailVente[$i]->prix) ;
-            $newDetailVente->setSuppr(0) ;
-
-            $entityManager = $this->entityManager ;
-            $entityManager->persist($newDetailVente) ;
-            $entityManager->flush() ;
-        }
 
         $client = $cli->find($vente->client->id) ;
         $client->setCompte($client->getCompte() + $vente->montanttotal - $data->montantEncaisse) ;
@@ -132,22 +123,40 @@ class VenteController extends AbstractController
         $entityManager->persist($PaiementCredit) ;
         $entityManager->flush() ;
 
-        $stock = $s->findOneByProduitAndUniteAndMagasin($produitInsert, $u->find($detailVente[$i]->id), $mag->find(1)) ;
-        $stock->setQte($stock->getQte() - $detailVente[$i]->valeur) ;
-        $entityManager = $this->entityManager ;
-        $entityManager->persist($stock) ;
-        $entityManager->flush() ;
+        for ( $i=0; $i < count($detailVente) ; $i++ ) {
+            $newDetailVente = new DetailVente() ;
+            $newDetailVente->setVente($newVente) ;
+            $produitInsert = $p->find($detailVente[$i]->produits->id) ;
+            $newDetailVente->setProduit($produitInsert) ;
+            $newDetailVente->setUnite($u->find($detailVente[$i]->id)) ;
+            $newDetailVente->setQte($detailVente[$i]->valeur) ;
+            $newDetailVente->setPrix($detailVente[$i]->prix) ;
+            $newDetailVente->setSuppr(0) ;
 
-        $mouvementStk = new MouvementStock() ;
-        $mouvementStk->setDate(new DateTime()) ;
-        $mouvementStk->setEmplacementoriginMagasin($mag->find(1)) ;
-        $mouvementStk->setQte($detailVente[$i]->valeur) ;
-        $mouvementStk->setDescription('VENTE') ;
-        $mouvementStk->setUniteP($u->find($detailVente[$i]->id)) ;
-        $entityManager = $this->entityManager ;
-        $entityManager->persist($mouvementStk) ;
-        $entityManager->flush() ;
+            $entityManager = $this->entityManager ;
+            $entityManager->persist($newDetailVente) ;
+            $entityManager->flush() ;
 
+            $stock = $s->findOneByProduitAndUniteAndMagasin($produitInsert, $u->find($detailVente[$i]->id), $mag->find(1)) ;
+            $stockReste = $stock->getQte() - $detailVente[$i]->valeur ;
+            $stock->setQte($stockReste) ;
+            $stock->setQteTheorique($stockReste) ;
+            $entityManager = $this->entityManager ;
+            $entityManager->persist($stock) ;
+            $entityManager->flush() ;
+
+            $mouvementStk = new MouvementStock() ;
+            $mouvementStk->setDate(new DateTime()) ;
+            $mouvementStk->setEmplacementoriginMagasin($mag->find(1)) ;
+            $mouvementStk->setQte($detailVente[$i]->valeur) ;
+            $mouvementStk->setDescription('VENTE') ;
+            $mouvementStk->setUniteP($u->find($detailVente[$i]->id)) ;
+            $mouvementStk->setProduits($produitInsert) ;
+
+            $entityManager = $this->entityManager ;
+            $entityManager->persist($mouvementStk) ;
+            $entityManager->flush() ;
+        }
         return $this->json(['Produits' => $u->findBySuppr(0)], 200, [], ['groups' => 'stock:read']) ;
 
     }

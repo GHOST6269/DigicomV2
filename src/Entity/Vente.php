@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: VenteRepository::class)]
 class Vente
@@ -14,36 +15,52 @@ class Vente
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('client:read')]
+    
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'ventes')]
     #[ORM\JoinColumn(nullable: false)]
+    
+
     private ?Magasin $magasin = null;
-
     #[ORM\Column]
-    private ?int $montanttotal = null;
+    #[Groups('client:read')]
 
+    private ?int $montanttotal = null;
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups('client:read')]
     private ?\DateTimeInterface $date = null;
 
     /**
      * @var Collection<int, DetailVente>
      */
     #[ORM\OneToMany(targetEntity: DetailVente::class, mappedBy: 'vente')]
+    
+
     private Collection $detailVentes;
 
     #[ORM\ManyToOne(inversedBy: 'ventes')]
     #[ORM\JoinColumn(nullable: true)]
+    
+
     private ?Utilisateur $utilisateur = null;
 
     #[ORM\ManyToOne]
     private ?Client $client = null;
 
     #[ORM\Column(length: 255)]
+    
+
     private ?string $modePaiement = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+
     private ?string $refPaiement = null;
+
+    #[ORM\Column(type: Types::SMALLINT)]
+    #[Groups('client:read')]
+    private ?int $paid = null;
 
     public function __construct()
     {
@@ -165,6 +182,18 @@ class Vente
     public function setRefPaiement(?string $refPaiement): static
     {
         $this->refPaiement = $refPaiement;
+
+        return $this;
+    }
+
+    public function getPaid(): ?int
+    {
+        return $this->paid;
+    }
+
+    public function setPaid(int $paid): static
+    {
+        $this->paid = $paid;
 
         return $this;
     }

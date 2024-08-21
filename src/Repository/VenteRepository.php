@@ -15,6 +15,7 @@ class VenteRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Vente::class);
     }
+    
 
 //    /**
 //     * @return Vente[] Returns an array of Vente objects

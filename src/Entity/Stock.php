@@ -48,6 +48,9 @@ class Stock
     #[ORM\OneToMany(targetEntity: UnitesP::class, mappedBy: 'stockDepot')]
     private Collection $unitesPs;
 
+    #[ORM\Column]
+    private ?int $qteTheorique = null;
+
     public function __construct()
     {
         $this->unitesPs = new ArrayCollection();
@@ -143,6 +146,18 @@ class Stock
                 $unitesP->setStockDepot(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getQteTheorique(): ?int
+    {
+        return $this->qteTheorique;
+    }
+
+    public function setQteTheorique(int $qteTheorique): static
+    {
+        $this->qteTheorique = $qteTheorique;
 
         return $this;
     }

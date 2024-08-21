@@ -81,6 +81,9 @@ class MouvementStock
     #[ORM\JoinColumn(nullable: true)]
     private ?Achat $achat = null;
 
+    #[ORM\ManyToOne(inversedBy: 'mouvementStocks')]
+    private ?Inventaire $inventaire = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -238,6 +241,18 @@ class MouvementStock
     public function setAchat(?Achat $achat): static
     {
         $this->achat = $achat;
+
+        return $this;
+    }
+
+    public function getInventaire(): ?Inventaire
+    {
+        return $this->inventaire;
+    }
+
+    public function setInventaire(?Inventaire $inventaire): static
+    {
+        $this->inventaire = $inventaire;
 
         return $this;
     }

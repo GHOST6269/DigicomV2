@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\PaiementCreditRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PaiementCreditRepository::class)]
 class PaiementCredit
@@ -12,23 +13,29 @@ class PaiementCredit
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('client:read')]
     private ?int $id = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups('client:read')]
     private ?Vente $vente = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups('client:read')]
     private ?Client $client = null;
 
     #[ORM\Column]
+    #[Groups('client:read')]
     private ?int $montantPaye = null;
 
     #[ORM\Column]
+    #[Groups('client:read')]
     private ?int $resteAPaye = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups('client:read')]
     private ?\DateTimeInterface $date = null;
 
     public function getId(): ?int
